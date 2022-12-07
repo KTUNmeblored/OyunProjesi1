@@ -24,16 +24,16 @@ public class PlayerControl : MonoBehaviour
     private void Start()
     {
         // Screen.SetResolution(Screen.currentResolution.width / 100, Screen.currentResolution.height / 100, true);
-        StartCoroutine(SpawnLevel());
+        // StartCoroutine(SpawnLevel());
         StartCoroutine(BeSlow());
     }
 
     private void Update()
     {
         //Player Acceleration
-        transform.Translate(Vector3.forward * Time.deltaTime * forwardSpeed);
+        //transform.Translate(Vector3.forward * Time.deltaTime * forwardSpeed);
         //Camera Acceleration
-        tempCam.transform.Translate(0, 0, Time.deltaTime * forwardSpeed, Space.World);
+        //tempCam.transform.Translate(0, 0, Time.deltaTime * forwardSpeed, Space.World);
         //Touch Controller
         if (Input.touchCount > 0)
         {
@@ -46,32 +46,33 @@ public class PlayerControl : MonoBehaviour
                 touchDown = touch.position / 10;
                 touchUp = touch.position / 10;
             }
-        }
-        if (dragStarted)
-        {
-            //Touch Swipe
-            if (touch.phase == TouchPhase.Moved)
+            if (dragStarted)
             {
+                //Touch Swipe
+                if (touch.phase == TouchPhase.Moved)
+                {
 
-                touchDown = touch.position / 10;
+                    touchDown = touch.position / 10;
 
+                }
+                //Touch Stability
+                if (touch.phase == TouchPhase.Stationary)
+                    touchUp = touchDown;
+                //Touch Finish
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    touchDown = touch.position / 10;
+                    isMoving = false;
+                    dragStarted = false;
+                }
+                if (isMoving && isDragable)
+                    transform.Translate(new Vector3(CalculateDirection().x, 0, 0) * Time.deltaTime * 10);
+                //Max and Min Range
+                Mathf.Clamp(transform.position.x, -1.5f, 1.5f);
+                //gameObject.transform.position = new Vector3(Mathf.Clamp(CalculateDirection().x, -1.5f, 1.5f), 1, transform.position.z);
             }
-            //Touch Stability
-            if (touch.phase == TouchPhase.Stationary)
-                touchUp = touchDown;
-            //Touch Finish
-            if (touch.phase == TouchPhase.Ended)
-            {
-                touchDown = touch.position / 10;
-                isMoving = false;
-                dragStarted = false;
-            }
-            if (isMoving && isDragable)
-                transform.Translate(new Vector3(CalculateDirection().x, 0, 0) * Time.deltaTime * 10);
-            //Max and Min Range
-            Mathf.Clamp(transform.position.x, -1.5f, 1.5f);
-            //gameObject.transform.position = new Vector3(Mathf.Clamp(CalculateDirection().x, -1.5f, 1.5f), 1, transform.position.z);
         }
+
         //Dragable Positions
         if (transform.position.x >= -1.5f && transform.position.x <= 1.5f)
             isDragable = true;
@@ -89,9 +90,6 @@ public class PlayerControl : MonoBehaviour
                 touchUp = touchDown;
                 transform.position = new Vector3(-1.5f, 1, transform.position.z);
             }
-
-
-
         }
     }
 
