@@ -6,16 +6,32 @@ using UnityEngine.UI;
 
 public class BulletShoot : MonoBehaviour
 {
+    [SerializeField] public ObjectsPool objectPool = null;
+
     // SpawnPoint
     public Transform bulletPoint;
-    // DestroyTime
-    public float lifetime = 3;
+    public Button firee;
 
-    public void Shoot(GameObject bullet)
+    public void Shoot(int objectType)
     {
         //Spawn New Object
-        GameObject obj = Instantiate(bullet, bulletPoint.position, Quaternion.identity);
-        Destroy(obj, lifetime);
+        var obj = objectPool.GetPooledObject(objectType);
+        obj.transform.position = bulletPoint.position;
+        StartCoroutine(Disableobj(obj));
+        StartCoroutine(DisableButton(firee));
     }
 
+    // Object Disable
+    IEnumerator Disableobj(GameObject obj)
+    {
+        yield return new WaitForSeconds(5);
+        obj.SetActive(false);
+    }
+    // Fire cooldown
+    IEnumerator DisableButton(Button firee)
+    {
+        firee.interactable = false;
+        yield return new WaitForSeconds(0.5f);
+        firee.interactable = true;
+    }
 }
