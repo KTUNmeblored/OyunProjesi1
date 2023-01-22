@@ -68,27 +68,27 @@ public class PlayerControl : MonoBehaviour
                 if (isMoving && isDragable)
                     transform.Translate(new Vector3(CalculateDirection().x, 0, 0) * Time.deltaTime * 10);
                 //Max and Min Range
-                Mathf.Clamp(transform.position.x, -1.5f, 1.5f);
+                Mathf.Clamp(transform.position.x, -1.7f, 1.7f);
                 //gameObject.transform.position = new Vector3(Mathf.Clamp(CalculateDirection().x, -1.5f, 1.5f), 1, transform.position.z);
             }
         }
 
         //Dragable Positions
-        if (transform.position.x >= -1.5f && transform.position.x <= 1.5f)
+        if (transform.position.x >= -1.7f && transform.position.x <= 1.7f)
             isDragable = true;
         else
         {
             //Change Position To Dragable Position
             isDragable = false;
-            if (transform.position.x >= -1.5f)
+            if (transform.position.x >= -1.7f)
             {
-                transform.position = new Vector3(1.5f, 1, transform.position.z);
+                transform.position = new Vector3(1.7f, 1, transform.position.z);
                 touchUp = touchDown;
             }
-            else if (transform.position.x <= 1.5f)
+            else if (transform.position.x <= 1.7f)
             {
                 touchUp = touchDown;
-                transform.position = new Vector3(-1.5f, 1, transform.position.z);
+                transform.position = new Vector3(-1.7f, 1, transform.position.z);
             }
         }
     }
