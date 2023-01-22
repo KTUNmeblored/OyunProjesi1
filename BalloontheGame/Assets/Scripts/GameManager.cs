@@ -7,6 +7,10 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+    public ObjectsPool objectsPool;
+    public EnemyManager enemyManager;
+
     [Header("Player Stats")]
     [SerializeField]float playerHealth = 10; //The health value of the balloon can be controlled with this variable.
     [SerializeField]float playerCoin = 10000f;
@@ -41,7 +45,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI baloonUpgradeValueText;
 
 
-    public static bool isGameActive;
+    public bool isGameActive;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +54,17 @@ public class GameManager : MonoBehaviour
         currentBaloonCost = baloonUpgradeCosts[baloonUpgradeCostIndex];
 
     }
+
+    private void MakeInstance()
+    {
+        if (instance == null)
+            instance = this;
+    }
+    private void Awake()
+    {
+        MakeInstance();
+    }
+
 
     // Update is called once per frame
     void Update()
