@@ -12,47 +12,42 @@ public class GameManager : MonoBehaviour
     public EnemyManager enemyManager;
 
     [Header("Player Stats")]
-    [SerializeField]float playerHealth = 10; //The health value of the balloon can be controlled with this variable.
-    [SerializeField]float playerCoin = 10000f;
-    private readonly float[] bulletUpgradeCosts = { 100, 250, 500, 750, 1000, 1250, 1750, 2500, 5000, 10000 };
-    private readonly float[] baloonUpgradeCosts = { 100, 250, 500, 750, 1000, 1250, 1750, 2500, 5000, 10000 };
-    float currentBulletCost;//Mermi gelistirmenin mevcut maliyeti
-    float currentBaloonCost;//Balon gelistirmenin mevcut maliyeti
-    private float bulletUpgradeCurrentValue = 0;//Mermi sliderini güncellemek icin gerekli olan degisken
-    private float baloonUpgradeCurrentValue = 0;//Balon sliderini güncellemek icin gerekli olan degisken
-    private int bulletUpgradeCostIndex = 0;//Yukarida tanimlanan mermi maliyet dizisi icin gerekli olan index degiskeni
-    private int baloonUpgradeCostIndex = 0;//Yukarida tanimlanan mermi maliyet dizisi icin gerekli olan index degiskeni
-    //public TextMeshProUGUI gameOverText;
-    //public Image restartBackground;
-    //public Button mainMenuButton;
-    //public Button restartButton;
-    
+    [SerializeField] float playerHealth; //The health value of the balloon can be controlled with this variable.
+    [SerializeField] int playerMoney;
+    [SerializeField] float bulletDamage;
+
+    int currentBulletDamageValue = 100, nextBulletDamageValue, currentHealthValue = 100, nextHealthValue;
+    int bulletCost = 250, healthCost =250;
+
     [Header("Menu Items")]
-    public GameObject restartMenu; //Game over menusunu bos bir gameobject icerisinde toplayip bu gameobject ile kontrol etmeyi dusundum.
-    public GameObject upgradeMenu; // Game over menusu ile ayni mantik.
+    public GameObject restartMenu;
+    public GameObject upgradeMenu;
 
     [Header("Buttons")]
     public Button bulletUpgradeButton;
-    public Button baloonUpgradeButton;
-
-    [Header("Slider")]
-    public Slider bulletUpgradeSlider;
-    public Slider baloonUpgradeSlider;
+    public Button healthUpgradeButton;
+    public Button playButton;
+    public Button settingsButton;
 
     [Header("Text")]
-    public TextMeshProUGUI playerCoinText;
+    public TextMeshProUGUI playerMoneyText;
     public TextMeshProUGUI bulletUpgradeValueText;
+    public TextMeshProUGUI bulletUpgradeCostText;
     public TextMeshProUGUI baloonUpgradeValueText;
-
+    public TextMeshProUGUI baloonUpgradeCostText;
 
     public bool isGameActive;
     // Start is called before the first frame update
     void Start()
     {
         isGameActive = true;
-        currentBulletCost = bulletUpgradeCosts[bulletUpgradeCostIndex];
-        currentBaloonCost = baloonUpgradeCosts[baloonUpgradeCostIndex];
 
+        nextBulletDamageValue = currentBulletDamageValue + 20;
+        nextHealthValue = currentHealthValue + 50;
+        bulletDamage= currentBulletDamageValue;
+        playerHealth = currentHealthValue;
+
+        UpdateUIElements();
     }
 
     private void MakeInstance()
@@ -65,147 +60,89 @@ public class GameManager : MonoBehaviour
         MakeInstance();
     }
 
-
     // Update is called once per frame
     void Update()
     {
         GameOver(); //Checks if the game is over.
         UpdateUIElements();
-        UpdateCosts();
         
     }
 
+    public void PlayGame()
+    {
+        upgradeMenu.SetActive(false);
+    }
     public void GameOver() //buraya reklam eklenebilir.
     {
         if (playerHealth <= 0)
         {
-            //restartBackground.gameObject.SetActive(true);
-            //restartButton.gameObject.SetActive(true);
-            //mainMenuButton.gameObject.SetActive(true);
-            //gameOverText.gameObject.SetActive(true);
             restartMenu.SetActive(true);
             isGameActive = false;
         }
     }
 
+    /// <summary>
+    /// UI Elementlerini gunceller.
+    /// </summary>
     void UpdateUIElements()
     {
-        playerCoinText.text = playerCoin.ToString();
-        if(bulletUpgradeCurrentValue == 10)
+        if(playerMoney < bulletCost) // Oyuncunun parasi gelistirme maliyetinden azsa buton inaktif olur.
         {
-            bulletUpgradeValueText.text = "Full";
             bulletUpgradeButton.interactable = false;
         }
-        else
+        else if(playerMoney >= bulletCost) // Oyuncunun parasi gelistirme maliyetinden fazlaysa buton aktif olur.
         {
-            bulletUpgradeValueText.text = currentBulletCost.ToString();
+            bulletUpgradeButton.interactable = true;
         }
-        if(baloonUpgradeCurrentValue == 10)
+        if(playerMoney < healthCost) // Oyuncunun parasi gelistirme maliyetinden azsa buton inaktif olur.
         {
-            baloonUpgradeValueText.text = "Full";
-            baloonUpgradeButton.interactable = false;
+            healthUpgradeButton.interactable = false;
         }
-        else
+        else if(playerMoney >= healthCost) // Oyuncunun parasi gelistirme maliyetinden fazlaysa buton aktif olur.
         {
-            baloonUpgradeValueText.text = currentBaloonCost.ToString();
+            healthUpgradeButton.interactable = true;
         }
-        
+
+        playerMoneyText.text = playerMoney.ToString();
+        bulletUpgradeCostText.text = bulletCost.ToString();
+        bulletUpgradeValueText.text = $"{currentBulletDamageValue} > {nextBulletDamageValue}";
+        baloonUpgradeCostText.text = healthCost.ToString();
+        baloonUpgradeValueText.text = $"{currentHealthValue} > {nextHealthValue}";
     }
-    void UpdateCosts()
-    {
-        currentBaloonCost = baloonUpgradeCosts[baloonUpgradeCostIndex];
-        currentBulletCost = bulletUpgradeCosts[bulletUpgradeCostIndex];
-    }
+    
     public void RestartGame()
     {
         SceneManager.LoadScene("Main"); //After the main menu is added, this will change and restart the game
     }
 
-    //public void BackToMainMenu()
-    //{
-    //    SceneManager.LoadScene("Main"); //When the main menu is added, this will return to the main menu
-    //}
-
+    
     /// <summary>
-    /// Upgrade menuyu acar.
-    /// </summary>
-    public void OpenUpgradeMenu()
-    {
-        upgradeMenu.SetActive(true);
-        
-    }
-    /// <summary>
-    /// Upgrade menuyu kapatir.
-    /// </summary>
-    public void CloseUpgradeMenu()
-    {
-        upgradeMenu.SetActive(false);
-    }
-    /// <summary>
-    /// UpgradeBullet metodu icin kullanilir. Mermi slider indexini ve maliyet miktarini degistirir.
-    /// </summary>
-    void IncreaseBulletUpgradeValue()
-    {
-        if(bulletUpgradeCurrentValue < 10)
-        {
-            bulletUpgradeCurrentValue += 1;
-            if(bulletUpgradeCurrentValue == 10)
-            {
-                bulletUpgradeCostIndex = 9;
-                
-            }
-            else
-            {
-                bulletUpgradeCostIndex += 1;
-            }
-
-        }
-        
-    }
-    /// <summary>
-    /// Mermiyi guclendirir.
+    /// Mermi hasarini guclendirir.
     /// </summary>
     public void UpgradeBullet()
     {
-        if(bulletUpgradeCurrentValue < 10 && playerCoin >= currentBulletCost)
+        if(playerMoney >= bulletCost)
         {
-            playerCoin -= currentBulletCost;
-            IncreaseBulletUpgradeValue();
-            bulletUpgradeSlider.value = bulletUpgradeCurrentValue;
+            playerMoney -= bulletCost;
+            currentBulletDamageValue = nextBulletDamageValue;
+            bulletDamage = currentBulletDamageValue;
+            nextBulletDamageValue += 20;
+            bulletCost *= 2;
         }
         
     }
+    
     /// <summary>
-    /// UpgradeBaloon metodu icin kullanilir.Balon slider indexini ve maliyet miktarini degistirir.
+    /// Balonun cani gelistirir.
     /// </summary>
-    void IncreaseBaloonUpgradeValue()
+    public void UpgradeHealth()
     {
-        if (bulletUpgradeCurrentValue < 10)
+        if(playerMoney >= healthCost)
         {
-            baloonUpgradeCurrentValue += 1;
-            if (baloonUpgradeCurrentValue == 10)
-            {
-                baloonUpgradeCostIndex = 9;
-                
-            }
-            else
-            {
-                baloonUpgradeCostIndex += 1;
-            }
-            
-        }
-
-    }
-    /// <summary>
-    /// Balonu gelistirir.
-    /// </summary>
-    public void UpgradeBaloon()
-    {
-        if(baloonUpgradeCurrentValue < 10 && playerCoin >= currentBaloonCost)
-        {
-            playerCoin -= currentBaloonCost;
-            IncreaseBaloonUpgradeValue();
-            baloonUpgradeSlider.value = baloonUpgradeCurrentValue;
+            playerMoney -= healthCost;
+            currentHealthValue = nextHealthValue;
+            nextHealthValue += 50;
+            healthCost *= 2;
         }
     }
     
