@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     [Header("Menu Items")]
     public GameObject restartMenu;
     public GameObject upgradeMenu;
+    public GameObject settingsMenu;
 
     [Header("Buttons")]
     public Button bulletUpgradeButton;
@@ -58,6 +59,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         MakeInstance();
+        Time.timeScale = 0f;
     }
 
     // Update is called once per frame
@@ -67,10 +69,14 @@ public class GameManager : MonoBehaviour
         UpdateUIElements();
         
     }
-
+    /// <summary>
+    /// Oyunu baslatir.
+    /// </summary>
     public void PlayGame()
     {
+        
         upgradeMenu.SetActive(false);
+        Time.timeScale= 1.0f;
     }
     public void GameOver() //buraya reklam eklenebilir.
     {
@@ -78,6 +84,7 @@ public class GameManager : MonoBehaviour
         {
             restartMenu.SetActive(true);
             isGameActive = false;
+            Time.timeScale= 0f;
         }
     }
 
@@ -115,7 +122,17 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Main"); //After the main menu is added, this will change and restart the game
     }
 
-    
+    public void SettingsMenuOpen()
+    {
+        settingsMenu.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void ContinueGame()
+    {
+        Time.timeScale = 1.0f;
+        settingsMenu.SetActive(false);
+    }
     /// <summary>
     /// Mermi hasarini guclendirir.
     /// </summary>
